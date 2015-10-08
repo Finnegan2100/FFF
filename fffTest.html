@@ -1,0 +1,1132 @@
+<!doctype html>
+<meta charset="utf-8">
+
+<title> FRANK PACHOLSKI GAME</title>
+
+<canvas id="theCanvas" width="550" height="400">Your browser does not support canvas </canvas>
+
+<audio id="theme">
+<source src="Latin1Final.wav" type="audio/wav" ></source>
+<source src="Latin1Final.ogg" type="audio/ogg" ></source>
+</audio>
+
+<audio id="intro">
+<source src="tchai.wav" type="audio/wav" ></source>
+<source src="tchai.ogg" type="audio/ogg" ></source>
+</audio>
+
+<audio id="frank">
+<source src="frank1.wav" type="audio/wav" ></source>
+<source src="frank1.ogg" type="audio/ogg" ></source>
+</audio>
+
+<audio id="menuSwitch1">
+<source src="menuSwitch.wav" type="audio/wav" ></source>
+<source src="menuSwitch.ogg" type="audio/ogg" ></source>
+</audio>
+
+
+<style>
+#theCanvas      
+{
+background-color: #bbb; 
+}
+</style>
+
+<script>
+
+var canvas = document.getElementById("theCanvas");  //LEFT CANVAS
+var context = canvas.getContext("2d");
+
+var theme = document.querySelector("#theme");
+theme.load();
+
+var menuSwitch1 = document.querySelector("#menuSwitch1");
+menuSwitch1.load();
+
+var intro = document.querySelector("#intro");
+intro.load();
+
+var frank = document.querySelector("#frank");
+frank.load();
+
+
+var spriteObject =    //MAIN OBJECT
+{
+width: 100,
+height: 100,
+sourceX: 0,
+sourceY: 0,
+sourceWidth: 72,
+sourceHeight: 104,
+x: 0,
+y: 0,
+vx: 0,
+vy: 0,
+gravity: 2.1,
+explode: false,
+canShoot: true,
+visible: true,
+disappear: false,
+angle: 30,
+speed: .1,
+
+centerX: function()
+{
+return this.x + (this.width / 2);
+},
+centerY: function()
+{
+return this.y + (this.height / 2);
+},
+halfWidth: function()
+{
+return this.width / 2;
+},
+halfHeight: function()
+{
+return this.height / 2;
+}
+};
+
+var LEVEL = 0;
+var randomIconPlacement = Math.random() * .8; 
+var randomIcon = [0,47.25,94.5,141.75,189,236.25,283.5,330.75];
+var randomIconValue = 0;
+
+var overCredits = false;
+var overInstructions = false;
+
+var showCredits = false;
+var showInstructions = false;
+var instructionsPage = 1;
+
+var creditsHover = false;
+var instructionsHover = false;
+var playHover = false;
+var nextHover = false;
+var back1Hover = false;
+var back2Hover = false;
+
+var idleOn = true;
+var pineappleOn = false;
+var heartOn = false;
+var hatOn = false;
+var speedoOn = false;
+var peanutButterOn = false;
+var skullOn = false;
+var catOn = false;
+var flagOn = false;
+
+
+var menu = Object.create(spriteObject);
+menu.x = 0;
+menu.y = 0;
+menu.width = 550;
+menu.height = 400;
+
+var menuImage = new Image();
+menuImage.src = "menubk1.png";
+
+var creditsIcon = Object.create(spriteObject);
+creditsIcon.x = 20;
+creditsIcon.y = 300;
+creditsIcon.width = 164;
+creditsIcon.height = 20;
+
+var creditsIconImage = new Image();
+creditsIconImage.src = "creditsIcon.png";
+
+var yellowCreditsIconImage = new Image();
+yellowCreditsIconImage.src = "y_credits.png";
+
+var instructionsIcon = Object.create(spriteObject);
+instructionsIcon.x = 20;
+instructionsIcon.y = 260;
+instructionsIcon.width = 270;
+instructionsIcon.height = 20;
+
+var instructionsIconImage = new Image();
+instructionsIconImage.src = "instructionsIcon.png";
+
+var yellowInstructionsIconImage = new Image();
+yellowInstructionsIconImage.src = "y_instructions.png";
+
+var playIcon = Object.create(spriteObject);
+playIcon.x = 20;
+playIcon.y = 220;
+playIcon.width = 100;
+playIcon.height = 20;
+
+var playIconImage = new Image();
+playIconImage.src = "playIcon.png";
+
+var yellowPlayIconImage = new Image();
+yellowPlayIconImage.src = "y_play.png";
+
+var credits = Object.create(spriteObject);
+credits.x = 0;
+credits.y = 0;
+credits.width = 550;
+credits.height = 400;
+
+var creditsImage = new Image();
+creditsImage.src = "creditsscreen.png";
+
+var instructions1 = Object.create(spriteObject);
+instructions1.x = 0;
+instructions1.y = 0;
+instructions1.width = 550;
+instructions1.height = 400;
+
+var instructions1Image = new Image();
+instructions1Image.src = "instructions1.png";
+
+var instructions2 = Object.create(spriteObject);
+instructions2.x = 0;
+instructions2.y = 0;
+instructions2.width = 550;
+instructions2.height = 400;
+
+var instructions2Image = new Image();
+instructions2Image.src = "instructions2.png";
+
+var instructions3 = Object.create(spriteObject);
+instructions3.x = 0;
+instructions3.y = 0;
+instructions3.width = 550;
+instructions3.height = 400;
+
+var instructions3Image = new Image();
+instructions3Image.src = "instructions3.png";
+
+var back = Object.create(spriteObject);
+back.x = 10;
+back.y = 335;
+back.width = 150;
+back.height = 50;
+
+var backImage = new Image();
+backImage.src = "back.png";
+
+var yellowBackImage = new Image();
+yellowBackImage.src = "y_back.png";
+
+var back2 = Object.create(spriteObject);
+back2.x = 10;
+back2.y = 335;
+back2.width = 150;
+back2.height = 50;
+
+var back2Image = new Image();
+back2Image.src = "back.png";
+
+var yellowBack2Image = new Image();
+yellowBack2Image.src = "y_back.png";
+
+var next = Object.create(spriteObject);
+next.x = 400;
+next.y = 345;
+next.width = 150;
+next.height = 35;
+
+var nextImage = new Image();
+nextImage.src = "next.png";
+
+var yellowNextImage = new Image();
+yellowNextImage.src = "y_next.png";
+
+//SCAN LINES
+
+var scanLines1 = Object.create(spriteObject);
+scanLines1.x = 0;
+scanLines1.y = 0;
+scanLines1.width = 550;
+scanLines1.height = 400;
+
+var scanLines1Image = new Image();
+scanLines1Image.src = "scanlines10per.png";
+
+var scanLines2 = Object.create(spriteObject);
+scanLines2.x = 0;
+scanLines2.y = 0;
+scanLines2.width = 550;
+scanLines2.height = 400;
+
+var scanLines2Image = new Image();
+scanLines2Image.src = "scanlines20per.png";
+
+var scanLines3 = Object.create(spriteObject);
+scanLines3.x = 0;
+scanLines3.y = 0;
+scanLines3.width = 550;
+scanLines3.height = 400;
+
+var scanLines3Image = new Image();
+scanLines3Image.src = "scanlinesstatic.png";
+
+var scanLines4 = Object.create(spriteObject);
+scanLines4.x = 0;
+scanLines4.y = 0;
+scanLines4.width = 550;
+scanLines4.height = 400;
+
+var scanLines4Image = new Image();
+scanLines4Image.src = "staticlines.png";
+
+var scanLines5 = Object.create(spriteObject);
+scanLines5.x = 0;
+scanLines5.y = 0;
+scanLines5.width = 550;
+scanLines5.height = 400;
+
+var scanLines5Image = new Image();
+scanLines5Image.src = "superstaticlines1.png";
+
+//VARIABLES FOR V-HOLD
+
+var centerScale = 0;
+var range = Math.random() * 2;
+var angle = 100;
+var speed = 4;
+
+
+var background = Object.create(spriteObject);
+background.x = 0;
+background.y = 0;
+background.width = 550;
+background.height = 400;
+
+var backgroundImage = new Image();
+backgroundImage.src = "backgroundtest1.png";
+
+//FRANK DANCES
+
+var idle = Object.create(spriteObject);
+idle.x = 255;
+idle.y = 250;
+idle.width = 56;
+idle.height = 104;
+idle.sourceWidth = 56;
+idle.sourceHeight = 104;
+
+var idleImage = new Image();
+idleImage.src = "frankidle.png";
+
+var pineapple = Object.create(spriteObject);
+pineapple.x = 235;
+pineapple.y = 200;
+pineapple.width = 100;
+pineapple.height = 156;
+pineapple.sourceWidth = 100;
+pineapple.sourceHeight = 156;
+
+var pineappleImage = new Image();
+pineappleImage.src = "frankpinedance.png";
+
+var heart = Object.create(spriteObject);
+heart.x = 205;
+heart.y = 220;
+heart.width = 148;
+heart.height = 136;
+heart.sourceWidth = 148;
+heart.sourceHeight = 136;
+
+var heartImage = new Image();
+heartImage.src = "frankheartdance.png";
+
+var cat = Object.create(spriteObject);
+cat.x = 240;
+cat.y = 200;
+cat.width = 100;
+cat.height = 136;
+cat.sourceWidth = 100;
+cat.sourceHeight = 136;
+
+var catImage = new Image();
+catImage.src = "catdanceloop.png";
+
+var hat = Object.create(spriteObject);
+hat.x = 225;
+hat.y = 250;
+hat.width = 120;
+hat.height = 104;
+hat.sourceWidth = 120;
+hat.sourceHeight = 104;
+
+var hatImage = new Image();
+hatImage.src = "marchfrankloop.png";
+
+var speedo = Object.create(spriteObject);
+speedo.x = 255;
+speedo.y = 250;
+speedo.width = 72;
+speedo.height = 104;
+speedo.sourceWidth = 72;
+speedo.sourceHeight = 104;
+
+var speedoImage = new Image();
+speedoImage.src = "dance1_sheet.png";
+
+var peanutButter = Object.create(spriteObject);
+peanutButter.x = 225;
+peanutButter.y = 210;
+peanutButter.width = 152;
+peanutButter.height = 152;
+peanutButter.sourceWidth = 152;
+peanutButter.sourceHeight = 152;
+
+var peanutButterImage = new Image();
+peanutButterImage.src = "pbdancesheet1.png";
+
+var skull = Object.create(spriteObject);
+skull.x = 175;
+skull.y = 180;
+skull.width = 198;
+skull.height = 176;
+skull.sourceWidth = 198;
+skull.sourceHeight = 176;
+
+var skullImage = new Image();
+skullImage.src = "frankskeleton1.png";
+
+var flag = Object.create(spriteObject);
+flag.x = 225;
+flag.y = 200;
+flag.width = 160;
+flag.height = 160;
+flag.sourceWidth = 160;
+flag.sourceHeight = 160;
+
+flagImage = new Image();
+flagImage.src = "frankusa.png";
+
+
+var bubble = Object.create(spriteObject);
+bubble.x = 245;
+bubble.y = 250;
+bubble.width = 45;
+bubble.height = 52;
+bubble.visible = false;
+
+var bubbleImage = new Image();
+bubbleImage.src = "bubble.png";
+
+var icons = Object.create(spriteObject);
+icons.x = 180;
+icons.y = 145;
+icons.width = 45;
+icons.height = 52;
+icons.sourceWidth = 45;
+icons.sourceHeight = 52;
+
+var iconsImage = new Image();
+iconsImage.src = "icons.png";
+
+var iconSelect = Object.create(spriteObject);
+iconSelect.x = 180;
+iconSelect.y = 145;
+iconSelect.width = 67.5;
+iconSelect.height = 78;
+iconSelect.sourceWidth = 67.5;
+iconSelect.sourceHeight = 78;
+
+var iconSelectImage = new Image();
+iconSelectImage.src = "iconselect1.png";
+
+var icons2 = Object.create(spriteObject);
+icons2.x = 480;
+icons2.y = 195;
+icons2.width = 45;
+icons2.height = 52;
+icons2.sourceWidth = 45;
+icons2.sourceHeight = 52;
+
+var icons2Image = new Image();
+icons2Image.src = "icons2.png";
+
+var level1 = Object.create(spriteObject);
+level1.x = -300;
+level1.y = 170;
+level1.width = 300;
+level1.height = 111;
+
+var level1Image = new Image();
+level1Image.src = "level1.png";
+
+var logo = Object.create(spriteObject);
+logo.x = 40;
+logo.y = 195;
+logo.width = 220;
+logo.height = 160;
+logo.sourceWidth = 45;
+logo.sourceHeight = 52;
+
+var logoImage = new Image();
+logoImage.src = "Logo3.jpg";
+
+
+//TIMER FOR ADDING STATIC
+
+staticTimer();
+staticTimer2();
+jiggleTimer();
+
+var timeLeft1 = 3;
+var timeLeft2 = 0;    
+var timeLeft3 = 0; 
+
+var roundStart = false;
+
+//countdown();
+
+function countdown()
+{
+
+window.setTimeout(countdown,1000);  //TIMER FIRES EVERY SECOND
+timeLeft3--;
+
+if(timeLeft3 < 0)  //IF THE RIGHTMOST DIGIT GETS TO 0, MAKE IT 9 AND SUBTRACT 1 FROM MIDDLE DIGIT
+{
+timeLeft3 = 9;
+timeLeft2--;
+}
+if(timeLeft2 < 0) //IF THE MIDDLE DIGIT GETS TO 0, MAKE IT 5 AND SUBTRACT 1 FROM LEFTMOST DIGIT
+{
+timeLeft2 = 5;
+timeLeft1--;
+}
+
+if(timeLeft1 === 0 && timeLeft2 === 0 && timeLeft3 === 0)  //IF ALL THREE DIGITS REACH 0, GAME IS OVER
+{
+//won = true;
+}
+
+}
+
+function staticTimer()
+{
+if(LEVEL === 0)
+{
+context.drawImage(scanLines1Image,scanLines1.x,scanLines1.y,scanLines1.width,scanLines1.height);
+window.setTimeout(staticTimer,Math.random() * 1000);
+}
+}
+function staticTimer2()
+{
+if(LEVEL === 0)
+{
+context.drawImage(scanLines5Image,scanLines5.x,scanLines5.y,scanLines5.width,scanLines5.height);
+window.setTimeout(staticTimer2,Math.random() * 2000);
+}
+}
+function jiggleTimer()
+{
+if(LEVEL === 0)
+{
+window.setTimeout(jiggleTimer,Math.random() * 30);
+}
+}
+
+var mouseX = 0;
+var mouseY = 0;
+var mouseDown = false;
+
+
+//MOUSE MOVE LISTENER/HANDLER
+
+window.addEventListener("mousemove",mouseMoveHandler,false);
+
+function mouseMoveHandler(event)
+{ 
+//FIND THE MOUSE'S X AND Y POSITION AND SUBTRACT THE TOP AND LEFT OFFSET OF THE CANVAS
+
+  mouseX = event.pageX - canvas.offsetLeft;
+  mouseY = event.pageY - canvas.offsetTop;
+}
+
+//MOUSE DOWN + MOUSE UP HANDLERS
+
+canvas.onmousedown = function(e)
+{
+    mouseDown = true;
+}
+canvas.onmouseup = function(e)
+{
+    mouseDown = false;
+}
+
+
+//EVENT LISTENERS FOR MENU
+
+
+
+function randomIconTimer()
+{
+randomIconValue = Math.round(Math.random() * 7);
+randomIconPlacement = Math.random() * .8; 
+setTimeout(randomIconTimer,7000);
+}
+
+
+mainLoop();
+
+function mainLoop()
+{
+context.clearRect(0,0,canvas.width,canvas.height);
+window.setTimeout(mainLoop,193);
+
+
+
+//console.log(randomIconPlacement);
+//console.log(randomIconValue);
+
+if(LEVEL === 0)
+{
+
+menu.y =  Math.sin(angle) * range;
+angle += speed;
+
+if(menu.y > 10)
+{
+menu.y = 0;
+}
+
+if(showCredits === false && showInstructions === false)
+{
+context.drawImage(menuImage,menu.x,menu.y,menu.width,menu.height);
+
+context.drawImage(speedoImage,speedo.sourceX,speedo.sourceY,speedo.sourceWidth,speedo.sourceHeight,speedo.x + 160,speedo.y + 30,speedo.width * 1.2,speedo.height * 1.2);
+
+
+if(creditsHover === false)
+{
+context.drawImage(creditsIconImage,creditsIcon.x,creditsIcon.y,creditsIcon.width,creditsIcon.height);
+}
+	else 
+	{
+	context.drawImage(yellowCreditsIconImage,creditsIcon.x,creditsIcon.y,creditsIcon.width,creditsIcon.height);
+	}
+
+if(instructionsHover === false)
+{
+context.drawImage(instructionsIconImage,instructionsIcon.x,instructionsIcon.y,instructionsIcon.width,instructionsIcon.height);
+}
+	else
+	{
+	context.drawImage(yellowInstructionsIconImage,instructionsIcon.x,instructionsIcon.y,instructionsIcon.width,instructionsIcon.height);
+	}
+
+if(playHover === false)
+{
+context.drawImage(playIconImage,playIcon.x,playIcon.y,playIcon.width,playIcon.height);
+}
+	else
+	{
+	context.drawImage(yellowPlayIconImage,playIcon.x,playIcon.y,playIcon.width,playIcon.height);
+	}
+ 
+
+
+
+
+}
+}
+
+if(showCredits === true)
+{
+context.drawImage(creditsImage,credits.x,credits.y,credits.width,credits.height);
+
+	if(back1Hover === false)
+	{
+	context.drawImage(backImage,back.x,back.y,back.width,back.height);
+	}
+	else
+	{
+	context.drawImage(yellowBackImage,back.x,back.y,back.width,back.height);
+	}
+}
+
+if(showInstructions === true)
+{
+if (instructionsPage === 1)
+{
+context.drawImage(instructions1Image,instructions1.x,instructions1.y,instructions1.width,instructions1.height);
+	if(nextHover === true)
+	{
+	context.drawImage(nextImage,next.x,next.y,next.width,next.height);
+	}
+		else
+		{
+		context.drawImage(yellowNextImage,next.x,next.y,next.width,next.height);
+		}
+}
+	else if (instructionsPage === 2)
+	{
+	context.drawImage(instructions2Image,instructions2.x,instructions2.y,instructions2.width,instructions2.height);
+		if(nextHover === true)
+		{
+		context.drawImage(nextImage,next.x,next.y,next.width,next.height);
+		}
+			else
+			{
+			context.drawImage(yellowNextImage,next.x,next.y,next.width,next.height);
+			}
+	}
+		else if(instructionsPage === 3)
+		{
+		context.drawImage(instructions3Image,instructions3.x,instructions3.y,instructions3.width,instructions3.height);
+		}		
+			if(back2Hover === true)
+			{
+			context.drawImage(back2Image,back2.x,back2.y,back2.width,back2.height);
+			}
+			else
+			{
+			context.drawImage(yellowBack2Image,back2.x,back2.y,back2.width,back2.height);
+			}
+}
+
+
+
+if(LEVEL >= 1)
+{
+
+level1.x += level1.vx;
+
+level1.vx = 45;
+
+
+if(level1.x > 550)
+{
+level1.vx = 0;
+}
+
+
+
+theme.play();
+context.drawImage(backgroundImage,background.x,background.y,background.width,background.height);
+
+
+if(idleOn === true)
+{
+context.drawImage(idleImage,idle.sourceX,idle.sourceY,idle.sourceWidth,idle.sourceHeight,idle.x,idle.y,idle.width,idle.height);
+idle.sourceX += 56;
+
+	if(idle.sourceX > 1624)
+	{
+	idle.sourceX = 0;
+	}
+
+}
+if(pineappleOn === true)
+{
+console.log("IIIIII");
+context.drawImage(pineappleImage,pineapple.sourceX,pineapple.sourceY,pineapple.sourceWidth,pineapple.sourceHeight,pineapple.x,pineapple.y,pineapple.width,pineapple.height);
+pineapple.sourceX += 100;
+
+	if(pineapple.sourceX > 1800)
+	{
+	pineappleOn = false;
+	idleOn = true;
+	pineapple.sourceX = 0;
+	}
+
+}
+if(heartOn === true)
+{
+context.drawImage(heartImage,heart.sourceX,heart.sourceY,heart.sourceWidth,heart.sourceHeight,heart.x,heart.y,heart.width,heart.height);
+heart.sourceX += 148;
+
+	if(heart.sourceX > 7844)
+	{
+	heartOn = false;
+	idleOn = true;
+	heart.sourceX = 0;
+	}
+
+}
+if(hatOn === true)
+{
+context.drawImage(hatImage,hat.sourceX,hat.sourceY,hat.sourceWidth,hat.sourceHeight,hat.x,hat.y,hat.width,hat.height);
+hat.sourceX += 120;
+
+	if(hat.sourceX > 1320)
+	{
+	hatOn = false;
+	idleOn = true;
+	hat.sourceX = 0;
+	}
+
+}
+if(speedoOn === true)
+{
+context.drawImage(speedoImage,speedo.sourceX,speedo.sourceY,speedo.sourceWidth,speedo.sourceHeight,speedo.x,speedo.y,speedo.width,speedo.height);
+
+speedo.sourceX += 72;
+
+	if(speedo.sourceX > 936)
+	{
+	speedoOn = false;
+	idleOn = true;
+	speedo.sourceX = 0;
+	}
+
+}
+if(peanutButterOn === true)
+{
+context.drawImage(peanutButterImage,peanutButter.sourceX,peanutButter.sourceY,peanutButter.sourceWidth,peanutButter.sourceHeight,peanutButter.x,peanutButter.y,peanutButter.width,peanutButter.height);
+
+peanutButter.sourceX += 152;
+
+	if(peanutButter.sourceX > 2888)
+	{
+	peanutButterOn = false;
+	idleOn = true;
+	peanutButter.sourceX = 0;
+	}
+
+
+}
+if(skullOn === true)
+{
+context.drawImage(skullImage,skull.sourceX,skull.sourceY,skull.sourceWidth,skull.sourceHeight,skull.x,skull.y,skull.width,skull.height);
+skull.sourceX += 198;
+
+	if(skull.sourceX > 7926)
+	{
+	skullOn = false;
+	idleOn = true;
+	skull.sourceX = 0;
+	}
+
+}
+if(catOn === true)
+{
+context.drawImage(catImage,cat.sourceX,cat.sourceY,cat.sourceWidth,cat.sourceHeight,cat.x,cat.y,cat.width,cat.height);
+cat.sourceX += 100;
+
+	if(cat.sourceX > 3200)
+	{
+	catOn = false;
+	idleOn = true;	
+	cat.sourceX = 0;
+	}
+
+
+}
+if(flagOn === true)
+{
+context.drawImage(flagImage,flag.sourceX,flag.sourceY,flag.sourceWidth,flag.sourceHeight,flag.x,flag.y,flag.width,flag.height);
+flag.sourceX += 160;
+
+	if(flag.sourceX > 2720)
+	{
+	flagOn = false;
+	idleOn = true;
+	flag.sourceX = 0;
+	}
+
+}
+
+
+
+
+
+
+//DRAWING ICONS
+
+
+for(var i = 0; i < 8; i++)
+{
+context.fillStyle = "#000";
+context.fillRect(i * 80,60,100,60);
+context.fillStyle = "#c5c3c4";
+context.fillRect(i * 80,60,100,1);
+context.fillRect(i * 80,64,100,1);
+context.fillRect(i * 80,116,100,1);
+context.fillRect(i * 80,120,100,1);
+context.drawImage(iconSelectImage,i * 70.5,iconSelect.sourceY,iconSelect.sourceWidth,iconSelect.sourceHeight,i * 65,64,iconSelect.width,iconSelect.height);
+
+context.drawImage(level1Image,level1.x,level1.y,level1.width,level1.height);
+
+}
+
+
+context.fillStyle = "#fff";
+context.font = "bold 40px Verdana";
+context.fillText(timeLeft3,315,45);     //RIGHTMOST DIGIT
+
+context.fillText(timeLeft2,285,45);		//MIDDLE DIGIT
+
+context.fillText(":",265,45);			//COLON
+
+context.fillText(timeLeft1,235,45);		//LEFTMOST DIGIT
+
+
+//CALCULATING RANDOM PLACEMENT OF ICONS
+
+if(roundStart === true)
+{
+
+if(randomIconPlacement < .4) //PLACE ICONS ON THE LEFT...
+{
+if(randomIconPlacement < .1)
+{
+icons.x = 40;
+icons.y = 195;
+}
+if(randomIconPlacement < .2 && randomIconPlacement >= .1)
+{
+icons.x = 80;
+icons.y = 175;
+}
+if(randomIconPlacement < .3 && randomIconPlacement >= .2)
+{
+icons.x = 120;
+icons.y = 155;
+}
+if(randomIconPlacement < .4 && randomIconPlacement >= .3)
+{
+icons.x = 180;
+icons.y = 145;
+}
+icons.sourceX = randomIcon[randomIconValue];
+context.drawImage(iconsImage,icons.sourceX,icons.sourceY,icons.sourceWidth,icons.sourceHeight,icons.x,icons.y,icons.width,icons.height);
+icons2.x = 600;
+icons2.y = 400;
+
+}
+if(randomIconPlacement >= .4)  //PLACE ICONS ON THE RIGHT...
+{
+if(randomIconPlacement < .5 && randomIconPlacement >= .4)
+{
+icons2.x = 340;
+icons2.y = 145;
+}
+if(randomIconPlacement < .6 && randomIconPlacement >= .5)
+{
+icons2.x = 400;
+icons2.y = 155;
+}
+if(randomIconPlacement < .7 && randomIconPlacement >= .6)
+{
+icons2.x = 440;
+icons2.y = 175;
+}
+if(randomIconPlacement < .8 && randomIconPlacement >= .7)
+{
+icons2.x = 480;
+icons2.y = 195;
+}
+icons2.sourceX = randomIcon[randomIconValue];
+context.drawImage(icons2Image,icons2.sourceX,icons2.sourceY,icons2.sourceWidth,icons2.sourceHeight,icons2.x,icons2.y,icons2.width,icons2.height);
+icons.x = 600;
+icons.y = 400;
+}
+}
+}
+
+
+var vx1 = mouseX - creditsIcon.centerX();						
+var vy1 = mouseY - creditsIcon.centerY();
+
+var combinedHalfWidths1 = 5 + creditsIcon.halfWidth();
+var combinedHalfHeights1 = 5 + creditsIcon.halfHeight();
+
+  if(Math.abs(vx1) < combinedHalfWidths1) 
+  {
+    
+  if(Math.abs(vy1) < combinedHalfHeights1)
+   {
+		creditsHover = true;
+		if (mouseDown === true)
+		{
+        showCredits = true;
+		}
+	}
+  }
+  
+var vx2 = mouseX - instructionsIcon.centerX();						
+var vy2 = mouseY - instructionsIcon.centerY();
+
+var combinedHalfWidths2 =  5 + instructionsIcon.halfWidth();
+var combinedHalfHeights2 = 5 + instructionsIcon.halfHeight();
+
+  if(Math.abs(vx2) < combinedHalfWidths2) 
+  {
+    
+  if(Math.abs(vy2) < combinedHalfHeights2)
+   {
+		instructionsHover = true;
+		if (mouseDown === true)
+		{
+        showInstructions = true;
+		}
+	}
+  }
+
+var vx3 = mouseX - playIcon.centerX();						
+var vy3 = mouseY  - playIcon.centerY();
+
+var combinedHalfWidths3 = 15  + playIcon.halfWidth();
+var combinedHalfHeights3 = 8 + playIcon.halfHeight();
+
+  if(Math.abs(vx3) < combinedHalfWidths3) 
+  {
+    
+  if(Math.abs(vy3) < combinedHalfHeights3)
+   {
+		playHover = true;
+		if (mouseDown === true)
+		{
+	    LEVEL = 1;
+		roundStart = true;
+		randomIconTimer();
+		}
+	}
+  }
+  
+var vx4 = mouseX -  back.centerX();						
+var vy4 = mouseY  - back.centerY();
+
+var combinedHalfWidths4 = 5  + back.halfWidth();
+var combinedHalfHeights4 = 5 + back.halfHeight();
+
+  if(Math.abs(vx4) < combinedHalfWidths4) 
+  {
+    
+  if(Math.abs(vy4) < combinedHalfHeights4)
+   {
+		back1Hover = true;
+		if (mouseDown === true)
+		{
+		  showInstructions = false;
+		  }
+		  
+	}
+  }
+  
+var vx5 = mouseX - next.centerX();						
+var vy5 = mouseY  - next.centerY();
+
+var combinedHalfWidths5 = 5  + next.halfWidth();
+var combinedHalfHeights5 = 5 + next.halfHeight();
+
+  if(Math.abs(vx5) < combinedHalfWidths5) 
+  {
+    
+  if(Math.abs(vy5) < combinedHalfHeights5)
+   {
+		nextHover = true;
+		if (mouseDown === true)
+		{
+			if(instructionsPage < 3)
+			{
+			instructionsPage++;
+			}		
+		}
+	}
+  }
+ 
+var vx6 = mouseX - back2.centerX();						
+var vy6 = mouseY  - back2.centerY();
+
+var combinedHalfWidths6 = 5  + back2.halfWidth();
+var combinedHalfHeights6 = 5 + back2.halfHeight();
+
+  if(Math.abs(vx6) < combinedHalfWidths6) 
+  {
+    
+  if(Math.abs(vy6) < combinedHalfHeights6)
+   {
+		back2Hover = true;
+		if (mouseDown === true)
+		{
+		  instructionsPage = 1;
+		  showCredits = false;
+		}
+	}
+  }
+  
+if(LEVEL === 1)
+{  
+  
+for(var i = 1; i < 9; i++)
+{ 
+  
+var vx1 = mouseX - 60 * i;						
+var vy1 = mouseY  - 100;
+
+var combinedHalfWidths1 = 5  + 14;
+var combinedHalfHeights1 = 5 + 27;
+
+  if(Math.abs(vx1) < combinedHalfWidths1) 
+  {
+    
+  if(Math.abs(vy1) < combinedHalfHeights1)
+   {
+		
+		if (mouseDown === true)
+		{
+		if(i === 1 && idleOn === true)
+		{
+		 pineappleOn = true;
+		 idleOn = false;
+		 console.log("hit 1!"); 
+		}
+		if(i === 2 && idleOn === true)
+		{
+		 idleOn = false;
+		 heartOn = true;
+		 console.log("hit 2!"); 
+		}
+		if(i === 3 && idleOn === true)
+		{
+		 idleOn = false;
+		 hatOn = true;
+		 console.log("hit 3!"); 
+		}
+		if(i === 4 && idleOn === true)
+		{
+		 idleOn = false;
+		 speedoOn = true;
+		 console.log("hit 4!"); 
+		}
+		if(i === 5 && idleOn === true)
+		{
+		 idleOn = false;
+		 peanutButterOn = true;
+		 console.log("hit 5!"); 
+		}
+		if(i === 6 && idleOn === true)
+		{
+		 idleOn = false;
+		 skullOn = true;
+		 console.log("hit 6!"); 
+		}
+		if(i === 7 && idleOn === true)
+		{
+		 idleOn = false;
+		 catOn = true;
+		 console.log("hit 7!"); 
+		}
+		if(i === 8 && idleOn === true)
+		{
+		 idleOn = false;
+		 flagOn = true;
+		 console.log("hit 8!"); 
+		}
+		}
+	}
+  }
+  
+
+ }
+  
+}  
+
+}
+
+
+</script>
